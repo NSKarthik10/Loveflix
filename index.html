@@ -736,6 +736,24 @@ async function openYouTube(id, title, isMovie){
   });
 }
 
+/* fullscreen helpers (desktop + iPhone) */
+function goFullscreen(vid){
+  try{
+    if (vid.requestFullscreen) vid.requestFullscreen().catch(()=>{});
+    else if (vid.webkitRequestFullscreen) vid.webkitRequestFullscreen();
+    else if (vid.webkitEnterFullscreen){
+      if (vid.readyState >= 1) vid.webkitEnterFullscreen();
+      else vid.addEventListener("loadedmetadata", () => { try{ vid.webkitEnterFullscreen(); }catch(e){} }, { once:true });
+    }
+  }catch(e){}
+}
+function leaveFullscreen(vid){
+  try{
+    if (document.fullscreenElement) document.exitFullscreen();
+    else if (vid && vid.webkitDisplayingFullscreen) vid.webkitExitFullscreen();
+  }catch(e){}
+}
+
 function openVideo(src, title){
   const id = ytId(src);
   if (id){ openYouTube(id, title, src === CONFIG.movie.src); return; }
@@ -756,7 +774,8 @@ function openVideo(src, title){
   });
   /* The main film rolls straight into the end credits */
   if (src === CONFIG.movie.src){
-    vid.addEventListener("ended", () => { closeModal(); startCredits(); });
+    vid.addEventListener("ended", () => { leaveFullscreen(vid); closeModal(); startCredits(); });
+    goFullscreen(vid);
   }
   modalBody.appendChild(vid);
   openModal(title, "");
