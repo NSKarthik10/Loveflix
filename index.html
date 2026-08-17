@@ -315,11 +315,17 @@
   }
   .crew-ph .fname{font-family:ui-monospace,Menlo,monospace;color:#9a6a6f;background:rgba(0,0,0,.35);padding:.15rem .45rem;border-radius:4px;}
   .credit-end{text-align:center;color:#888;font-size:.9rem;margin-top:3rem;line-height:2.2;padding-bottom:2rem;}
-  .credit-final{
-    font-family:'Bebas Neue';font-size:clamp(2rem,5vw,3.6rem);
-    letter-spacing:.08em;text-align:center;color:#fff;
-    padding:1.5rem 0 4rem;
+  .yes-flip{
+    font-family:'Bebas Neue';font-size:clamp(2.6rem,9vw,6.5rem);
+    letter-spacing:.05em;text-align:center;color:#fff;
+    animation:fadeUp 1s ease;
   }
+  .yes-flip .red{color:var(--red);text-shadow:0 0 30px rgba(229,9,20,.5);}
+  .s-first{
+    display:inline-block;overflow:hidden;width:.62em;opacity:1;
+    transition:width 1.3s ease, opacity 1.3s ease;
+  }
+  .s-first.gone{width:0;opacity:0;}
   .skip-btn{
     position:absolute;right:2rem;bottom:2rem;z-index:5;
     background:rgba(40,40,40,.85);border:1px solid #555;color:#fff;
@@ -798,11 +804,6 @@ function buildCreditRoll(){
                    LOVEFLIX · November 2, 2025`;
   roll.appendChild(end);
 
-  const final = document.createElement("div");
-  final.className = "credit-final";
-  final.innerHTML = `He said yes<span style="color:var(--red)">.</span>`;
-  roll.appendChild(final);
-
   /* scroll duration scales with content */
   const dur = 12 + CONFIG.credits.length * 2;
   roll.style.setProperty("--roll-dur", dur + "s");
@@ -837,16 +838,28 @@ function startPostCredit(){
     vid.className = "post-video";
     vid.src = CONFIG.postCredit;
     vid.controls = true; vid.autoplay = true;
-    vid.addEventListener("ended", showComingSoon);
+    vid.playsInline = true; vid.setAttribute("playsinline","");
+    vid.addEventListener("ended", showYesFlip);
     vid.addEventListener("error", () => {
       inner.insertAdjacentHTML("beforeend",
         placeholderPanel("🎥","Post-credit scene coming soon.") +
         '<button class="btn btn-play" id="pcContinue" style="margin-top:1rem">Continue ▸</button>');
       vid.remove();
-      $("pcContinue").addEventListener("click", showComingSoon);
+      $("pcContinue").addEventListener("click", showYesFlip);
     });
     inner.appendChild(vid);
   }, 2000);
+}
+
+/* SHE SAID YES → the S slips away → HE SAID YES */
+function showYesFlip(){
+  const inner = $("postInner");
+  inner.innerHTML = `<div class="yes-flip"><span class="s-first" id="sFirst">S</span>HE SAID <span class="red">YES</span></div>`;
+  setTimeout(() => {
+    const s = $("sFirst");
+    if (s) s.classList.add("gone");
+  }, 2200);
+  setTimeout(() => { if (creditsPhase === "post") showComingSoon(); }, 6000);
 }
 
 function showComingSoon(){
