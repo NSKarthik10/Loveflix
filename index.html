@@ -315,6 +315,11 @@
   }
   .crew-ph .fname{font-family:ui-monospace,Menlo,monospace;color:#9a6a6f;background:rgba(0,0,0,.35);padding:.15rem .45rem;border-radius:4px;}
   .credit-end{text-align:center;color:#888;font-size:.9rem;margin-top:3rem;line-height:2.2;padding-bottom:2rem;}
+  .credit-final{
+    font-family:'Bebas Neue';font-size:clamp(2rem,5vw,3.6rem);
+    letter-spacing:.08em;text-align:center;color:#fff;
+    padding:1.5rem 0 4rem;
+  }
   .skip-btn{
     position:absolute;right:2rem;bottom:2rem;z-index:5;
     background:rgba(40,40,40,.85);border:1px solid #555;color:#fff;
@@ -411,7 +416,6 @@
       <div class="billboard-buttons">
         <button class="btn btn-play" id="playMovieBtn">▶&nbsp; Play</button>
         <button class="btn btn-info" id="scrollPhotosBtn">🖼&nbsp; Photos</button>
-        <button class="btn btn-info" id="creditsBtn">🎬&nbsp; End Credits</button>
       </div>
     </div>
   </section>
@@ -794,6 +798,11 @@ function buildCreditRoll(){
                    LOVEFLIX · November 2, 2025`;
   roll.appendChild(end);
 
+  const final = document.createElement("div");
+  final.className = "credit-final";
+  final.innerHTML = `He said yes<span style="color:var(--red)">.</span>`;
+  roll.appendChild(final);
+
   /* scroll duration scales with content */
   const dur = 12 + CONFIG.credits.length * 2;
   roll.style.setProperty("--roll-dur", dur + "s");
@@ -865,7 +874,6 @@ skipBtn.addEventListener("click", () => {
   if (creditsPhase === "post") closeCredits();
   else startPostCredit();
 });
-$("creditsBtn").addEventListener("click", startCredits);
 
 function openPhoto(src, caption){
   modalBody.innerHTML = "";
